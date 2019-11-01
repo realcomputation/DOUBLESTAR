@@ -18,9 +18,10 @@ void compute(){
   fpu_fix_start(NULL);
 
   // # of iterations
-  // double: correct by 90936
-  // DD and QD: correct by 4000000+alpha
   long nPlus = 100000;
+
+  // repetitions of performance tests
+  long m = 1<<10;
 
   // init values
   REAL rInit = 1.0;
@@ -29,7 +30,7 @@ void compute(){
   qd_real qdInit = 1.0;
 
   // precision controller(epsilon)
-  REAL eps = 0.000001;
+  int eps = -20;    // 2^(?)
 
   // setup pi
   REAL rPi = 3.14159;
@@ -46,15 +47,15 @@ void compute(){
   bool isDbroken=false, isDDbroken=false, isQDbroken=false;
   for(long i=0;i<nPlus;i++) {
     // check error
-    if(!isDbroken) { if(abs(r - REAL(d)) > eps) {
+    if(!isDbroken) { if(!bound(r - REAL(d), eps)) {
       cout << "correctness failure: double at " + to_string(i) + "\n";
       isDbroken = true;
     }}
-    if(!isDDbroken) { if(abs(r - REAL(dd.to_string())) > eps) {
+    if(!isDDbroken) { if(!bound(r - REAL(dd.to_string()), eps)) {
       cout << "correctness failure: DD at " + to_string(i) + "\n";
       isDDbroken = true;
     }}
-    if(!isQDbroken) { if(abs(r - REAL(qd.to_string())) > eps) {
+    if(!isQDbroken) { if(!bound(r - REAL(qd.to_string()), eps)) {
       cout << "correctness failure: QD at " + to_string(i) + "\n";
       isQDbroken = true;
     }}
@@ -73,40 +74,52 @@ void compute(){
   long elapsed;
 
   // iRRAM
-  r = rInit;
-  beginTime = high_resolution_clock::now();
-  for(long i=0;i<nPlus;i++) r += rPi;
-  endTime = high_resolution_clock::now();
-  elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();
-  cout << "iRRAM: " << elapsed << " ns \n";
+  elapsed = 0;
+  for(int i=0;i<m;i++) {
+    beginTime = high_resolution_clock::now();
+    r = rInit;
+    for(long i=0;i<nPlus;i++) r += rPi;
+    endTime = high_resolution_clock::now();
+    elapsed += duration_cast<nanoseconds>(endTime-beginTime).count();
+  }
+  cout << "iRRAM: " << elapsed/m << " ns \n";
 
   // double
   if(!isDbroken) {
-    d = dInit;
-    beginTime = high_resolution_clock::now();
-    for(long i=0;i<nPlus;i++) d += dPi;
-    endTime = high_resolution_clock::now();
-    elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();
-    cout << "double: " << elapsed << " ns \n";
+    elapsed = 0;
+    for(int i=0;i<m;i++) {
+      beginTime = high_resolution_clock::now();
+      d = dInit;
+      for(long i=0;i<nPlus;i++) d += dPi;
+      endTime = high_resolution_clock::now();
+      elapsed += duration_cast<nanoseconds>(endTime-beginTime).count();
+    }
+    cout << "double: " << elapsed/m << " ns \n";
   }
 
   // double double
   if(!isDDbroken) {
-    dd = ddInit;
-    beginTime = high_resolution_clock::now();
-    for(long i=0;i<nPlus;i++) dd += ddPi;
-    endTime = high_resolution_clock::now();
-    elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();
-    cout << "DD: " << elapsed << " ns \n";
+    elapsed = 0;
+    for(int i=0;i<m;i++) {
+      beginTime = high_resolution_clock::now();
+      dd = ddInit;
+      for(long i=0;i<nPlus;i++) dd += ddPi;
+      endTime = high_resolution_clock::now();
+      elapsed += duration_cast<nanoseconds>(endTime-beginTime).count();
+    }
+    cout << "DD: " << elapsed/m << " ns \n";
   }
 
   // quad double
   if(!isQDbroken) {
-    qd = qdInit;
-    beginTime = high_resolution_clock::now();
-    for(long i=0;i<nPlus;i++) qd += qdPi;
-    endTime = high_resolution_clock::now();
-    elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();
-    cout << "QD: " << elapsed << " ns \n";
+    elapsed = 0;
+    for(int i=0;i<m;i++) {
+      beginTime = high_resolution_clock::now();
+      qd = qdInit;
+      for(long i=0;i<nPlus;i++) qd += qdPi;
+      endTime = high_resolution_clock::now();
+      elapsed += duration_cast<nanoseconds>(endTime-beginTime).count();
+    }
+    cout << "QD: " << elapsed/m << " ns \n";
   }
 }

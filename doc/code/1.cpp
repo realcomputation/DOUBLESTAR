@@ -15,17 +15,13 @@ void compute(){
   fpu_fix_start(NULL);
 
   // input
-  int count;
-  cout << "\nIterated functions system: x = 3.75*x*(1-x)\n";
-  cout << "How many values: ";
-  cin  >> count;
-  cout << "\n";
+  int count=200;
 
   // initial values
-  REAL   xr= 0.5, cr=3.75;
-  double xd= 0.5, cd=3.75;
-  dd_real xdd= 0.5, cdd=3.75;
-  qd_real xqd= 0.5, cqd=3.75;
+  REAL   xr=RATIONAL(1,2), cr=RATIONAL(15,4);
+  double xd=1.0/2, cd=15.0/4;
+  dd_real xdd=1, cdd=15; xdd/=2; cdd/=4;
+  qd_real xqd=1, cqd=15; xqd/=2; cqd/=4;
 
   // epsilon setup
   REAL eps=0.000001;
