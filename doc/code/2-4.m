@@ -1,17 +1,34 @@
-iRRAM = [0 1818310 3871717 5459542 6750785 8635247 9947132 11758728 13812230 18689463 17253055];
-double = [0 38 51 39 42 40 38 38 47 48 50];
-DD = [0 30133 61892 130214 115878 141628 166278 219942 303960 290232 285337];
-QD = [0 276612 594097 884736 1129187 1400049 1719012 2043182 2423032 2677895 2798857];
-idx = 0:100:1000;
-
 % values
-plot(idx, iRRAM)
+idx = 0:100:1000;
+iRRAM=[ 0 1681688 3346861 5080634 6676655 8311261 10034068 11581949 13409914 15135516 17218219 ];
+double=[ 0 53 53 56 40 40 40 54 53 39 40 ];
+DD=[ 0 31403 63817 92358 118339 144700 171408 194743 222295 247799 282751 ];
+QD=[ 0 291835 584602 867127 1138493 1411165 1748068 1984476 2316362 2602703 3000588 ];
+
+
+
+% linear regression
+p_iRRAM = polyfit(idx,iRRAM,1)
+p_double = polyfit(idx(1:size(double,2)),double,1)
+p_DD = polyfit(idx(1:size(DD,2)),DD,1)
+p_QD = polyfit(idx(1:size(QD,2)),QD,1)
+
+
+% graph
+fplot(poly2sym(p_iRRAM))
 hold on
-plot(idx(1:size(double,2)), double)
-plot(idx(1:size(DD,2)), DD)
-plot(idx(1:size(QD,2)), QD)
+fplot(poly2sym(p_double))
+fplot(poly2sym(p_DD))
+fplot(poly2sym(p_QD))
+scatter(idx,iRRAM,'*')
+scatter(idx(1:size(double,2)), double, '+')
+scatter(idx(1:size(DD,2)), DD, 'o')
+scatter(idx(1:size(QD,2)), QD, 'x')
 hold off
 title('Performance test')
 xlabel('Iteration')
 ylabel('Elapsed time(ns)')
-legend('iRRAM','double','dd','qd')
+% xlim([idx(1), inf])
+% ylim([0, inf])
+lgd = legend('iRRAM','double','dd','qd');
+lgd.Location = 'northwest';
