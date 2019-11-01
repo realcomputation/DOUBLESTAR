@@ -35,21 +35,24 @@
 
 \section{Accuracy Test}
 
-As iRRAM supports arbitrary precision, all values given by iRRAM is
+As iRRAM supports arbitrary precision, all values given by iRRAM are
 assumed true. The other data structures will show prominent errors
 when calculating $x_{n+1}=3.75x_{n}\left(1-x_{n}\right),x_{1}=0.5$
-at some point. For double double(DD) and quad double(QD), we take
-advantage of \cite{hida2007library}.
+at some point. For double-double(DD) and quad-double(QD), we take
+advantage of \cite{hida2007library}. Take caution when you initialize
+a variable. If you put a floating number directly, it will be regarded
+as a double value first, and then converted to the target data structure.
+Hence, it is advisable to use division for a quotient number.
 
 \begin{algorithm}[H]
 \begin{lstlisting}[language={C++},numbers=left,showstringspaces=false]
 (...)
 
 // initial values
-REAL   xr= 0.5, cr=3.75;
-double xd= 0.5, cd=3.75;
-dd_real xdd= 0.5, cdd=3.75;
-qd_real xqd= 0.5, cqd=3.75;
+REAL   xr=RATIONAL(1,2), cr=RATIONAL(15,4);
+double xd=1.0/2, cd=15.0/4;
+dd_real xdd=1, cdd=15; xdd/=2; cdd/=4;
+qd_real xqd=1, cqd=15; xqd/=2; cqd/=4;
 
 (...)
 
@@ -100,16 +103,21 @@ were extended, even if both transitions make storage size double.
 We analyzed for some basic opertions. Each operation is applied repeatedly
 and we measure the elapsed time. This must not break correctness,
 thereby, we first check if the value is correct, and then do the test.
+Also, we repeated each experiment at least $2^{10}$times and took
+the average because outliers came up out of blue. Lastly, when the
+data seem to make a line, we made a linear regression on them.
 
 \begin{algorithm}[H]
 \begin{lstlisting}[language={C++},numbers=left,showstringspaces=false]
 // iRRAM
-r = rInit;
-beginTime = high_resolution_clock::now();  // timer begin
-for(long i=0;i<nPlus;i++) r += rPi;	// apply operation
-endTime = high_resolution_clock::now();  // timer end
-elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();  // get elapsed time
-cout << "iRRAM: " << elapsed << " ns \n";  // print
+for(int i=0;i<m;i++) {
+  beginTime = high_resolution_clock::now();	// start timer
+  r = rInit;
+  for(long i=0;i<nPlus;i++) r = sqrt(r);	// apply the operation
+  endTime = high_resolution_clock::now();	// stop timer
+  rElapsed += duration_cast<nanoseconds>(endTime-beginTime).count(); // elapsed time
+}
+rElapsed /= m;		// take the average
 \end{lstlisting}
 
 \caption{Part of code for addition performance test}
@@ -119,7 +127,7 @@ cout << "iRRAM: " << elapsed << " ns \n";  // print
 
 \subsection{Addition}
 
-Test setup: $x_{n+1}=x_{n}+c,\;x_{0}=1.0,c=3.14159$
+Test setup: $x_{n+1}=x_{n}+c,\;x_{0}=1.0,c=3.14159,\;\left|e_{n}\right|<2^{-20}$
 
 \begin{figure}[H]
 \centering{}\includegraphics[scale=0.95]{img/2-1}\caption{Addition Test}
@@ -131,39 +139,47 @@ Test setup: $x_{n+1}=x_{n}+c,\;x_{0}=1.0,c=3.14159$
 itr & iRRAM & double & DD & QD\tabularnewline
 \hline 
 \hline 
-10000 & 2218024 & 37 & 89737 & 329317\tabularnewline
+10000 & 2277466 & 40 & 85559 & 352622\tabularnewline
 \hline 
-20000 & 4602518 & 43 & 165619 & 801740\tabularnewline
+20000 & 4464846 & 61 & 171552 & 706488\tabularnewline
 \hline 
-30000 & 6904207 & 37 & 270899 & 1061150\tabularnewline
+30000 & 6706339 & 59 & 255780 & 1070855\tabularnewline
 \hline 
-40000 & 8786108 & 37 & 323277 & 1330845\tabularnewline
+40000 & 8975040 & 40 & 341247 & 1426889\tabularnewline
 \hline 
-50000 & 11305168 & 41 & 445272 & 1754624\tabularnewline
+50000 & 11187951 & 51 & 426594 & 1774732\tabularnewline
 \hline 
-60000 & 13481659 & 38 & 484875 & 2088568\tabularnewline
+60000 & 13375699 & 47 & 513372 & 2134957\tabularnewline
 \hline 
-70000 & 15487987 & 37 & 630103 & 2358365\tabularnewline
+70000 & 15690342 & 39 & 595202 & 2500221\tabularnewline
 \hline 
-80000 & 17854700 & 36 & 716757 & 2752079\tabularnewline
+80000 & 17920073 & 39 & 682645 & 2807334\tabularnewline
 \hline 
-90000 & 19961321 & 38 & 750007 & 3075830\tabularnewline
+90000 & 20019130 & - & 758295 & 3203934\tabularnewline
 \hline 
-100000 & 22194439 & - & 968803 & 3428676\tabularnewline
+100000 & 22350155 & - & 849898 & 3541002\tabularnewline
+\hline 
+\end{tabular}%
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+ & iRRAM & double & DD & QD\tabularnewline
+\hline 
+\hline 
+slope & 223 & -0.0002 & 8.5 & 35.4\tabularnewline
 \hline 
 \end{tabular}
-\centering{}\caption{Elapsed time(ns)}
+\centering{}\caption{Elapsed time(ns) and slope(ns/itr)}
 \end{table}
 
 Double is the fastest followed by DD, QD, and iRRAM. Double showed
-a constant time complexity, but failed at iteration \# 90936 because
+a constant time complexity, but failed at iteration \# 89893 because
 of lack of precision.
 
 \newpage{}
 
 \subsection{Multiplication}
 
-Test setup: $x_{n+1}=x_{n}c,\;x_{0}=1.0,c=3.14159$
+Test setup: $x_{n+1}=x_{n}c,\;x_{0}=1.0,c=3.14159,\;\left|e_{n}\right|<2^{-20}$
 
 \begin{figure}[H]
 \centering{}\includegraphics[scale=0.95]{img/2-2}\caption{Multiplication Test}
@@ -175,32 +191,40 @@ Test setup: $x_{n+1}=x_{n}c,\;x_{0}=1.0,c=3.14159$
 itr & iRRAM & double & DD & QD\tabularnewline
 \hline 
 \hline 
-5 & 1529 & 39 & 100 & 539\tabularnewline
+5 & 1207 & 43 & 90 & 253\tabularnewline
 \hline 
-10 & 2936 & 41 & 147 & 777\tabularnewline
+10 & 2164 & 40 & 162 & 466\tabularnewline
 \hline 
-15 & 3744 & 39 & 201 & 986\tabularnewline
+15 & 3314 & 40 & 201 & 728\tabularnewline
 \hline 
-20 & 4231 & - & 327 & 1277\tabularnewline
+20 & 4575 & - & 248 & 898\tabularnewline
 \hline 
-25 & 5273 & - & 326 & 1545\tabularnewline
+25 & 4954 & - & 316 & 1058\tabularnewline
 \hline 
-30 & 6218 & - & 375 & 1858\tabularnewline
+30 & 6190 & - & 441 & 1388\tabularnewline
 \hline 
-35 & 7108 & - & 445 & 2104\tabularnewline
+35 & 7033 & - & 467 & 1411\tabularnewline
 \hline 
-40 & 7812 & - & 545 & 2308\tabularnewline
+40 & 7952 & - & 500 & 1606\tabularnewline
 \hline 
-45 & 9127 & - & 543 & 2664\tabularnewline
+45 & 8960 & - & 571 & 1803\tabularnewline
 \hline 
-50 & 10022 & - & - & 2935\tabularnewline
+50 & 10191 & - & - & 2016\tabularnewline
 \hline 
-55 & 11084 & - & - & 3231\tabularnewline
+55 & 10952 & - & - & 2296\tabularnewline
 \hline 
-60 & 11802 & - & - & -\tabularnewline
+60 & 11834 & - & - & -\tabularnewline
+\hline 
+\end{tabular}%
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+ & iRRAM & double & DD & QD\tabularnewline
+\hline 
+\hline 
+slope & 192.93 & -0.3000 & 12.210 & 38.926\tabularnewline
 \hline 
 \end{tabular}
-\centering{}\caption{Elapsed time(ns)}
+\centering{}\caption{Elapsed time(ns) and slope(ns/itr)}
 \end{table}
 
 With dramatically reduced iterations, the same performance order was
@@ -210,7 +234,7 @@ shown up.
 
 \subsection{Sqrt\label{subsec:Sqrt}}
 
-Test setup: $x_{n+1}=\sqrt{x_{n}},\;x_{0}=3.14159$
+Test setup: $x_{n+1}=\sqrt{x_{n}},\;x_{0}=3.14159,\;\left|e_{n}\right|<2^{-70}$
 
 \begin{figure}[H]
 \centering{}\includegraphics[scale=0.95]{img/2-3}\caption{Sqrt Test}
@@ -222,33 +246,46 @@ Test setup: $x_{n+1}=\sqrt{x_{n}},\;x_{0}=3.14159$
 itr & iRRAM & double & DD & QD\tabularnewline
 \hline 
 \hline 
-5 & 1982 & 61 & 186 & 4333\tabularnewline
+10 & 6576 & - & 280 & 8824\tabularnewline
 \hline 
-10 & 3082 & 63 & 272 & 8447\tabularnewline
+20 & 7204 & - & 518 & 16734\tabularnewline
 \hline 
-15 & 4311 & 91 & 390 & 12624\tabularnewline
+30 & 10624 & - & 752 & 25149\tabularnewline
 \hline 
-20 & 5056 & 115 & 512 & 16489\tabularnewline
+40 & 14309 & - & 986 & 33089\tabularnewline
 \hline 
-25 & 6077 & 139 & 643 & 20411\tabularnewline
+50 & 18002 & - & 1245 & 41635\tabularnewline
 \hline 
-30 & 7333 & 184 & 781 & 24697\tabularnewline
+60 & 21792 & - & 1447 & 50126\tabularnewline
 \hline 
-35 & 8007 & 179 & 887 & 28649\tabularnewline
+70 & 25075 & - & 1635 & 56960\tabularnewline
 \hline 
-40 & 9137 & 254 & 1048 & 31991\tabularnewline
+80 & 28702 & - & 1912 & 67796\tabularnewline
+\hline 
+90 & 32293 & - & 2125 & 73445\tabularnewline
+\hline 
+100 & 35448 & - & 2300 & 83925\tabularnewline
+\hline 
+\end{tabular}%
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+ & iRRAM & double & DD & QD\tabularnewline
+\hline 
+\hline 
+slope & 340.6 & - & 22.653 & 828.02\tabularnewline
 \hline 
 \end{tabular}
-\centering{}\caption{Elapsed time(ns)}
+\centering{}\caption{Elapsed time(ns) and slope(ns/itr)}
 \end{table}
 
-iRRAM outperformed QD. Maybe sqrt for QD is poorly implemented.
+double couldn't produce any correct answer. iRRAM outperformed QD.
+Maybe sqrt for QD is poorly implemented.
 
 \newpage{}
 
 \subsection{Sin}
 
-Test setup: $x_{n+1}=\sin x_{n},\;x_{0}=3.14159$
+Test setup: $x_{n+1}=\sin x_{n},\;x_{0}=3.14159,\;\left|e_{n}\right|<2^{-20}$
 
 \begin{figure}[H]
 \centering{}\includegraphics[scale=0.95]{img/2-4}\caption{$\sin$ Test}
@@ -260,28 +297,36 @@ Test setup: $x_{n+1}=\sin x_{n},\;x_{0}=3.14159$
 itr & iRRAM & double & DD & QD\tabularnewline
 \hline 
 \hline 
-100 & 1818310 & 38 & 30133 & 276612\tabularnewline
+100 & 1681688 & 53 & 31403 & 291835\tabularnewline
 \hline 
-200 & 3871717 & 51 & 61892 & 594097\tabularnewline
+200 & 3346861 & 53 & 63817 & 584602\tabularnewline
 \hline 
-300 & 5459542 & 39 & 130214 & 884736\tabularnewline
+300 & 5080634 & 56 & 92358 & 867127\tabularnewline
 \hline 
-400 & 6750785 & 42 & 115878 & 1129187\tabularnewline
+400 & 6676655 & 40 & 118339 & 1138493\tabularnewline
 \hline 
-500 & 8635247 & 40 & 141628 & 1400049\tabularnewline
+500 & 8311261 & 40 & 144700 & 1411165\tabularnewline
 \hline 
-600 & 9947132 & 38 & 166278 & 1719012\tabularnewline
+600 & 10034068 & 40 & 171408 & 1748068\tabularnewline
 \hline 
-700 & 11758728 & 38 & 219942 & 2043182\tabularnewline
+700 & 11581949 & 54 & 194743 & 1984476\tabularnewline
 \hline 
-800 & 13812230 & 47 & 303960 & 2423032\tabularnewline
+800 & 13409914 & 53 & 222295 & 2316362\tabularnewline
 \hline 
-900 & 18689463 & 48 & 290232 & 2677895\tabularnewline
+900 & 15135516 & 39 & 247799 & 2602703\tabularnewline
 \hline 
-1000 & 17253055 & 50 & 285337 & 2798857\tabularnewline
+1000 & 17218219 & 40 & 282751 & 3000588\tabularnewline
+\hline 
+\end{tabular}%
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+ & iRRAM & double & DD & QD\tabularnewline
+\hline 
+\hline 
+slope & 17000 & -0.0114 & 270 & 2947\tabularnewline
 \hline 
 \end{tabular}
-\centering{}\caption{Elapsed time(ns)}
+\centering{}\caption{Elapsed time(ns) and slope(ns/itr)}
 \end{table}
 
 In the last part of iRRAM curve, there is a subtle performance improvement.
@@ -333,9 +378,6 @@ on both hands,
 
 Therefore, we keep adding up $1/k!$ from $\text{\eqref{eq:e_taylor}}$
 until $2/n!\leq2^{p}$ is satisfied.
-
-As one last remark, we repeated each experiment $2^{14}$times and
-took the average because outliers came up out of blue.
 
 \subsubsection{iRRAM vs double}
 

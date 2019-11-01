@@ -91,14 +91,14 @@ Accuracy Test
 \end_layout
 
 \begin_layout Standard
-As iRRAM supports arbitrary precision, all values given by iRRAM is assumed
+As iRRAM supports arbitrary precision, all values given by iRRAM are assumed
  true.
  The other data structures will show prominent errors when calculating 
 \begin_inset Formula $x_{n+1}=3.75x_{n}\left(1-x_{n}\right),x_{1}=0.5$
 \end_inset
 
  at some point.
- For double double(DD) and quad double(QD), we take advantage of 
+ For double-double(DD) and quad-double(QD), we take advantage of 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "hida2007library"
@@ -107,6 +107,10 @@ literal "false"
 \end_inset
 
 .
+ Take caution when you initialize a variable.
+ If you put a floating number directly, it will be regarded as a double
+ value first, and then converted to the target data structure.
+ Hence, it is advisable to use division for a quotient number.
 \end_layout
 
 \begin_layout Standard
@@ -138,22 +142,22 @@ status open
 
 \begin_layout Plain Layout
 
-REAL   xr= 0.5, cr=3.75;
+REAL   xr=RATIONAL(1,2), cr=RATIONAL(15,4);
 \end_layout
 
 \begin_layout Plain Layout
 
-double xd= 0.5, cd=3.75;
+double xd=1.0/2, cd=15.0/4;
 \end_layout
 
 \begin_layout Plain Layout
 
-dd_real xdd= 0.5, cdd=3.75;
+dd_real xdd=1, cdd=15; xdd/=2; cdd/=4;
 \end_layout
 
 \begin_layout Plain Layout
 
-qd_real xqd= 0.5, cqd=3.75;
+qd_real xqd=1, cqd=15; xqd/=2; cqd/=4;
 \end_layout
 
 \begin_layout Plain Layout
@@ -378,6 +382,13 @@ We analyzed for some basic opertions.
  Each operation is applied repeatedly and we measure the elapsed time.
  This must not break correctness, thereby, we first check if the value is
  correct, and then do the test.
+ Also, we repeated each experiment at least 
+\begin_inset Formula $2^{10}$
+\end_inset
+
+times and took the average because outliers came up out of blue.
+ Lastly, when the data seem to make a line, we made a linear regression
+ on them.
 \end_layout
 
 \begin_layout Standard
@@ -400,35 +411,43 @@ status open
 
 \begin_layout Plain Layout
 
-r = rInit;
+for(int i=0;i<m;i++) {
 \end_layout
 
 \begin_layout Plain Layout
 
-beginTime = high_resolution_clock::now();  // timer begin
+  beginTime = high_resolution_clock::now();	// start timer
 \end_layout
 
 \begin_layout Plain Layout
 
-for(long i=0;i<nPlus;i++) r += rPi;	// apply operation
+  r = rInit;
 \end_layout
 
 \begin_layout Plain Layout
 
-endTime = high_resolution_clock::now();  // timer end
+  for(long i=0;i<nPlus;i++) r = sqrt(r);	// apply the operation
 \end_layout
 
 \begin_layout Plain Layout
 
-elapsed = duration_cast<nanoseconds>(endTime-beginTime).count();  // get
- elapsed time
+  endTime = high_resolution_clock::now();	// stop timer
 \end_layout
 
 \begin_layout Plain Layout
 
-cout << "iRRAM: " << elapsed << " ns 
-\backslash
-n";  // print
+  rElapsed += duration_cast<nanoseconds>(endTime-beginTime).count(); // elapsed
+ time
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+rElapsed /= m;		// take the average
 \end_layout
 
 \end_inset
@@ -466,7 +485,7 @@ Addition
 
 \begin_layout Standard
 Test setup: 
-\begin_inset Formula $x_{n+1}=x_{n}+c,\;x_{0}=1.0,c=3.14159$
+\begin_inset Formula $x_{n+1}=x_{n}+c,\;x_{0}=1.0,c=3.14159,\;\left|e_{n}\right|<2^{-20}$
 \end_inset
 
 
@@ -594,20 +613,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2218024
+2277466
 \end_layout
 
 \end_inset
@@ -616,20 +622,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-37
+40
 \end_layout
 
 \end_inset
@@ -638,20 +631,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-89737
+85559
 \end_layout
 
 \end_inset
@@ -660,20 +640,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-329317
+352622
 \end_layout
 
 \end_inset
@@ -706,20 +673,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-4602518
+4464846
 \end_layout
 
 \end_inset
@@ -728,20 +682,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-43
+61
 \end_layout
 
 \end_inset
@@ -750,20 +691,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-165619
+171552
 \end_layout
 
 \end_inset
@@ -772,20 +700,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-801740
+706488
 \end_layout
 
 \end_inset
@@ -818,20 +733,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-6904207
+6706339
 \end_layout
 
 \end_inset
@@ -840,20 +742,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-37
+59
 \end_layout
 
 \end_inset
@@ -862,20 +751,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-270899
+255780
 \end_layout
 
 \end_inset
@@ -884,20 +760,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1061150
+1070855
 \end_layout
 
 \end_inset
@@ -930,20 +793,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-8786108
+8975040
 \end_layout
 
 \end_inset
@@ -952,20 +802,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-37
+40
 \end_layout
 
 \end_inset
@@ -974,20 +811,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-323277
+341247
 \end_layout
 
 \end_inset
@@ -996,20 +820,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1330845
+1426889
 \end_layout
 
 \end_inset
@@ -1042,20 +853,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-11305168
+11187951
 \end_layout
 
 \end_inset
@@ -1064,20 +862,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-41
+51
 \end_layout
 
 \end_inset
@@ -1086,20 +871,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-445272
+426594
 \end_layout
 
 \end_inset
@@ -1108,20 +880,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1754624
+1774732
 \end_layout
 
 \end_inset
@@ -1154,20 +913,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-13481659
+13375699
 \end_layout
 
 \end_inset
@@ -1176,20 +922,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-38
+47
 \end_layout
 
 \end_inset
@@ -1198,20 +931,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-484875
+513372
 \end_layout
 
 \end_inset
@@ -1220,20 +940,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2088568
+2134957
 \end_layout
 
 \end_inset
@@ -1266,20 +973,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-15487987
+15690342
 \end_layout
 
 \end_inset
@@ -1288,20 +982,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-37
+39
 \end_layout
 
 \end_inset
@@ -1310,20 +991,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-630103
+595202
 \end_layout
 
 \end_inset
@@ -1332,20 +1000,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2358365
+2500221
 \end_layout
 
 \end_inset
@@ -1378,20 +1033,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-17854700
+17920073
 \end_layout
 
 \end_inset
@@ -1400,20 +1042,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-36
+39
 \end_layout
 
 \end_inset
@@ -1422,20 +1051,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-716757
+682645
 \end_layout
 
 \end_inset
@@ -1444,20 +1060,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2752079
+2807334
 \end_layout
 
 \end_inset
@@ -1490,20 +1093,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-19961321
+20019130
 \end_layout
 
 \end_inset
@@ -1512,20 +1102,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-38
+-
 \end_layout
 
 \end_inset
@@ -1534,20 +1111,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-750007
+758295
 \end_layout
 
 \end_inset
@@ -1556,20 +1120,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-3075830
+3203934
 \end_layout
 
 \end_inset
@@ -1602,20 +1153,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-22194439
+22350155
 \end_layout
 
 \end_inset
@@ -1624,19 +1162,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -1646,20 +1171,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-968803
+849898
 \end_layout
 
 \end_inset
@@ -1668,20 +1180,114 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
+3541002
+\end_layout
 
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-3428676
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iRRAM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+slope
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+223
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-0.0002
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+35.4
 \end_layout
 
 \end_inset
@@ -1699,7 +1305,7 @@ QD
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Elapsed time(ns)
+Elapsed time(ns) and slope(ns/itr)
 \end_layout
 
 \end_inset
@@ -1714,7 +1320,7 @@ Elapsed time(ns)
 
 \begin_layout Standard
 Double is the fastest followed by DD, QD, and iRRAM.
- Double showed a constant time complexity, but failed at iteration # 90936
+ Double showed a constant time complexity, but failed at iteration # 89893
  because of lack of precision.
 \end_layout
 
@@ -1731,7 +1337,7 @@ Multiplication
 
 \begin_layout Standard
 Test setup: 
-\begin_inset Formula $x_{n+1}=x_{n}c,\;x_{0}=1.0,c=3.14159$
+\begin_inset Formula $x_{n+1}=x_{n}c,\;x_{0}=1.0,c=3.14159,\;\left|e_{n}\right|<2^{-20}$
 \end_inset
 
 
@@ -1859,20 +1465,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1529
+1207
 \end_layout
 
 \end_inset
@@ -1881,20 +1474,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-39
+43
 \end_layout
 
 \end_inset
@@ -1903,20 +1483,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-100
+90
 \end_layout
 
 \end_inset
@@ -1925,20 +1492,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-539
+253
 \end_layout
 
 \end_inset
@@ -1971,20 +1525,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2936
+2164
 \end_layout
 
 \end_inset
@@ -1993,20 +1534,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-41
+40
 \end_layout
 
 \end_inset
@@ -2015,20 +1543,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-147
+162
 \end_layout
 
 \end_inset
@@ -2037,20 +1552,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-777
+466
 \end_layout
 
 \end_inset
@@ -2083,20 +1585,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-3744
+3314
 \end_layout
 
 \end_inset
@@ -2105,20 +1594,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-39
+40
 \end_layout
 
 \end_inset
@@ -2127,19 +1603,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 201
 \end_layout
 
@@ -2149,20 +1612,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-986
+728
 \end_layout
 
 \end_inset
@@ -2195,20 +1645,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-4231
+4575
 \end_layout
 
 \end_inset
@@ -2217,19 +1654,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2239,20 +1663,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-327
+248
 \end_layout
 
 \end_inset
@@ -2261,20 +1672,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1277
+898
 \end_layout
 
 \end_inset
@@ -2307,20 +1705,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-5273
+4954
 \end_layout
 
 \end_inset
@@ -2329,19 +1714,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2351,20 +1723,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-326
+316
 \end_layout
 
 \end_inset
@@ -2373,20 +1732,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1545
+1058
 \end_layout
 
 \end_inset
@@ -2419,20 +1765,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-6218
+6190
 \end_layout
 
 \end_inset
@@ -2441,19 +1774,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2463,20 +1783,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-375
+441
 \end_layout
 
 \end_inset
@@ -2485,20 +1792,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1858
+1388
 \end_layout
 
 \end_inset
@@ -2531,20 +1825,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-7108
+7033
 \end_layout
 
 \end_inset
@@ -2553,19 +1834,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2575,20 +1843,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-445
+467
 \end_layout
 
 \end_inset
@@ -2597,20 +1852,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2104
+1411
 \end_layout
 
 \end_inset
@@ -2643,20 +1885,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-7812
+7952
 \end_layout
 
 \end_inset
@@ -2665,19 +1894,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2687,20 +1903,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-545
+500
 \end_layout
 
 \end_inset
@@ -2709,20 +1912,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2308
+1606
 \end_layout
 
 \end_inset
@@ -2755,20 +1945,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-9127
+8960
 \end_layout
 
 \end_inset
@@ -2777,19 +1954,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2799,20 +1963,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-543
+571
 \end_layout
 
 \end_inset
@@ -2821,20 +1972,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2664
+1803
 \end_layout
 
 \end_inset
@@ -2867,20 +2005,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-10022
+10191
 \end_layout
 
 \end_inset
@@ -2889,19 +2014,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2911,19 +2023,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -2933,20 +2032,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-2935
+2016
 \end_layout
 
 \end_inset
@@ -2979,20 +2065,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-11084
+10952
 \end_layout
 
 \end_inset
@@ -3001,19 +2074,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -3023,19 +2083,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -3045,20 +2092,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-3231
+2296
 \end_layout
 
 \end_inset
@@ -3091,20 +2125,7 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-11802
+11834
 \end_layout
 
 \end_inset
@@ -3113,19 +2134,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -3135,19 +2143,6 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
 \end_layout
 
@@ -3157,20 +2152,114 @@ QD
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 -
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iRRAM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+slope
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+192.93
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-0.3000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+12.210
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38.926
 \end_layout
 
 \end_inset
@@ -3188,7 +2277,7 @@ QD
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Elapsed time(ns)
+Elapsed time(ns) and slope(ns/itr)
 \end_layout
 
 \end_inset
@@ -3226,7 +2315,7 @@ name "subsec:Sqrt"
 
 \begin_layout Standard
 Test setup: 
-\begin_inset Formula $x_{n+1}=\sqrt{x_{n}},\;x_{0}=3.14159$
+\begin_inset Formula $x_{n+1}=\sqrt{x_{n}},\;x_{0}=3.14159,\;\left|e_{n}\right|<2^{-70}$
 \end_inset
 
 
@@ -3269,11 +2358,11 @@ Sqrt Test
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="9" columns="5">
+<lyxtabular version="3" rows="11" columns="5">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -3345,118 +2434,6 @@ QD
 \uwave off
 \noun off
 \color none
-5
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-1982
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-61
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-186
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-4333
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
 10
 \end_layout
 
@@ -3479,7 +2456,16 @@ QD
 \uwave off
 \noun off
 \color none
-3082
+6576
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
 \end_layout
 
 \end_inset
@@ -3501,29 +2487,7 @@ QD
 \uwave off
 \noun off
 \color none
-63
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-272
+280
 \end_layout
 
 \end_inset
@@ -3545,119 +2509,7 @@ QD
 \uwave off
 \noun off
 \color none
-8447
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-15
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-4311
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-91
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-390
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-12624
+8824
 \end_layout
 
 \end_inset
@@ -3703,7 +2555,16 @@ QD
 \uwave off
 \noun off
 \color none
-5056
+7204
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
 \end_layout
 
 \end_inset
@@ -3725,29 +2586,7 @@ QD
 \uwave off
 \noun off
 \color none
-115
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-512
+518
 \end_layout
 
 \end_inset
@@ -3769,119 +2608,7 @@ QD
 \uwave off
 \noun off
 \color none
-16489
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-25
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-6077
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-139
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-643
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-20411
+16734
 \end_layout
 
 \end_inset
@@ -3927,7 +2654,16 @@ QD
 \uwave off
 \noun off
 \color none
-7333
+10624
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
 \end_layout
 
 \end_inset
@@ -3949,29 +2685,7 @@ QD
 \uwave off
 \noun off
 \color none
-184
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-781
+752
 \end_layout
 
 \end_inset
@@ -3993,7 +2707,7 @@ QD
 \uwave off
 \noun off
 \color none
-24697
+25149
 \end_layout
 
 \end_inset
@@ -4001,118 +2715,6 @@ QD
 </row>
 <row>
 <cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-35
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-8007
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-179
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-887
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\xout off
-\uuline off
-\uwave off
-\noun off
-\color none
-28649
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -4134,6 +2736,578 @@ QD
 
 \end_inset
 </cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+14309
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+986
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+33089
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+18002
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+1245
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+41635
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+21792
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+1447
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+50126
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+70
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+25075
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+1635
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+56960
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+80
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+28702
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+1912
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+67796
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+32293
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+2125
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\xout off
+\uuline off
+\uwave off
+\noun off
+\color none
+73445
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
@@ -4151,7 +3325,7 @@ QD
 \uwave off
 \noun off
 \color none
-9137
+100
 \end_layout
 
 \end_inset
@@ -4173,7 +3347,16 @@ QD
 \uwave off
 \noun off
 \color none
-254
+35448
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
 \end_layout
 
 \end_inset
@@ -4195,7 +3378,7 @@ QD
 \uwave off
 \noun off
 \color none
-1048
+2300
 \end_layout
 
 \end_inset
@@ -4217,7 +3400,114 @@ QD
 \uwave off
 \noun off
 \color none
-31991
+83925
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iRRAM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+slope
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+340.6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+22.653
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+828.02
 \end_layout
 
 \end_inset
@@ -4235,7 +3525,7 @@ QD
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Elapsed time(ns)
+Elapsed time(ns) and slope(ns/itr)
 \end_layout
 
 \end_inset
@@ -4249,7 +3539,8 @@ Elapsed time(ns)
 \end_layout
 
 \begin_layout Standard
-iRRAM outperformed QD.
+double couldn't produce any correct answer.
+ iRRAM outperformed QD.
  Maybe sqrt for QD is poorly implemented.
 \end_layout
 
@@ -4266,7 +3557,7 @@ Sin
 
 \begin_layout Standard
 Test setup: 
-\begin_inset Formula $x_{n+1}=\sin x_{n},\;x_{0}=3.14159$
+\begin_inset Formula $x_{n+1}=\sin x_{n},\;x_{0}=3.14159,\;\left|e_{n}\right|<2^{-20}$
 \end_inset
 
 
@@ -4410,7 +3701,7 @@ QD
 \uwave off
 \noun off
 \color none
-1818310
+1681688
 \end_layout
 
 \end_inset
@@ -4432,7 +3723,7 @@ QD
 \uwave off
 \noun off
 \color none
-38
+53
 \end_layout
 
 \end_inset
@@ -4454,7 +3745,7 @@ QD
 \uwave off
 \noun off
 \color none
-30133
+31403
 \end_layout
 
 \end_inset
@@ -4476,7 +3767,7 @@ QD
 \uwave off
 \noun off
 \color none
-276612
+291835
 \end_layout
 
 \end_inset
@@ -4522,7 +3813,7 @@ QD
 \uwave off
 \noun off
 \color none
-3871717
+3346861
 \end_layout
 
 \end_inset
@@ -4544,7 +3835,7 @@ QD
 \uwave off
 \noun off
 \color none
-51
+53
 \end_layout
 
 \end_inset
@@ -4566,7 +3857,7 @@ QD
 \uwave off
 \noun off
 \color none
-61892
+63817
 \end_layout
 
 \end_inset
@@ -4588,7 +3879,7 @@ QD
 \uwave off
 \noun off
 \color none
-594097
+584602
 \end_layout
 
 \end_inset
@@ -4634,7 +3925,7 @@ QD
 \uwave off
 \noun off
 \color none
-5459542
+5080634
 \end_layout
 
 \end_inset
@@ -4656,7 +3947,7 @@ QD
 \uwave off
 \noun off
 \color none
-39
+56
 \end_layout
 
 \end_inset
@@ -4678,7 +3969,7 @@ QD
 \uwave off
 \noun off
 \color none
-130214
+92358
 \end_layout
 
 \end_inset
@@ -4700,7 +3991,7 @@ QD
 \uwave off
 \noun off
 \color none
-884736
+867127
 \end_layout
 
 \end_inset
@@ -4746,7 +4037,7 @@ QD
 \uwave off
 \noun off
 \color none
-6750785
+6676655
 \end_layout
 
 \end_inset
@@ -4768,7 +4059,7 @@ QD
 \uwave off
 \noun off
 \color none
-42
+40
 \end_layout
 
 \end_inset
@@ -4790,7 +4081,7 @@ QD
 \uwave off
 \noun off
 \color none
-115878
+118339
 \end_layout
 
 \end_inset
@@ -4812,7 +4103,7 @@ QD
 \uwave off
 \noun off
 \color none
-1129187
+1138493
 \end_layout
 
 \end_inset
@@ -4858,7 +4149,7 @@ QD
 \uwave off
 \noun off
 \color none
-8635247
+8311261
 \end_layout
 
 \end_inset
@@ -4902,7 +4193,7 @@ QD
 \uwave off
 \noun off
 \color none
-141628
+144700
 \end_layout
 
 \end_inset
@@ -4924,7 +4215,7 @@ QD
 \uwave off
 \noun off
 \color none
-1400049
+1411165
 \end_layout
 
 \end_inset
@@ -4970,7 +4261,7 @@ QD
 \uwave off
 \noun off
 \color none
-9947132
+10034068
 \end_layout
 
 \end_inset
@@ -4992,7 +4283,7 @@ QD
 \uwave off
 \noun off
 \color none
-38
+40
 \end_layout
 
 \end_inset
@@ -5014,7 +4305,7 @@ QD
 \uwave off
 \noun off
 \color none
-166278
+171408
 \end_layout
 
 \end_inset
@@ -5036,7 +4327,7 @@ QD
 \uwave off
 \noun off
 \color none
-1719012
+1748068
 \end_layout
 
 \end_inset
@@ -5082,7 +4373,7 @@ QD
 \uwave off
 \noun off
 \color none
-11758728
+11581949
 \end_layout
 
 \end_inset
@@ -5104,7 +4395,7 @@ QD
 \uwave off
 \noun off
 \color none
-38
+54
 \end_layout
 
 \end_inset
@@ -5126,7 +4417,7 @@ QD
 \uwave off
 \noun off
 \color none
-219942
+194743
 \end_layout
 
 \end_inset
@@ -5148,7 +4439,7 @@ QD
 \uwave off
 \noun off
 \color none
-2043182
+1984476
 \end_layout
 
 \end_inset
@@ -5194,7 +4485,7 @@ QD
 \uwave off
 \noun off
 \color none
-13812230
+13409914
 \end_layout
 
 \end_inset
@@ -5216,7 +4507,7 @@ QD
 \uwave off
 \noun off
 \color none
-47
+53
 \end_layout
 
 \end_inset
@@ -5238,7 +4529,7 @@ QD
 \uwave off
 \noun off
 \color none
-303960
+222295
 \end_layout
 
 \end_inset
@@ -5260,7 +4551,7 @@ QD
 \uwave off
 \noun off
 \color none
-2423032
+2316362
 \end_layout
 
 \end_inset
@@ -5306,7 +4597,7 @@ QD
 \uwave off
 \noun off
 \color none
-18689463
+15135516
 \end_layout
 
 \end_inset
@@ -5328,7 +4619,7 @@ QD
 \uwave off
 \noun off
 \color none
-48
+39
 \end_layout
 
 \end_inset
@@ -5350,7 +4641,7 @@ QD
 \uwave off
 \noun off
 \color none
-290232
+247799
 \end_layout
 
 \end_inset
@@ -5372,7 +4663,7 @@ QD
 \uwave off
 \noun off
 \color none
-2677895
+2602703
 \end_layout
 
 \end_inset
@@ -5418,7 +4709,7 @@ QD
 \uwave off
 \noun off
 \color none
-17253055
+17218219
 \end_layout
 
 \end_inset
@@ -5440,7 +4731,7 @@ QD
 \uwave off
 \noun off
 \color none
-50
+40
 \end_layout
 
 \end_inset
@@ -5462,7 +4753,7 @@ QD
 \uwave off
 \noun off
 \color none
-285337
+282751
 \end_layout
 
 \end_inset
@@ -5484,7 +4775,114 @@ QD
 \uwave off
 \noun off
 \color none
-2798857
+3000588
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+iRRAM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+double
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+QD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+slope
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+17000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-0.0114
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+270
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2947
 \end_layout
 
 \end_inset
@@ -5502,7 +4900,7 @@ QD
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Elapsed time(ns)
+Elapsed time(ns) and slope(ns/itr)
 \end_layout
 
 \end_inset
@@ -5674,14 +5072,6 @@ Therefore, we keep adding up
 \end_inset
 
  is satisfied.
-\end_layout
-
-\begin_layout Standard
-As one last remark, we repeated each experiment 
-\begin_inset Formula $2^{14}$
-\end_inset
-
-times and took the average because outliers came up out of blue.
 \end_layout
 
 \begin_layout Subsubsection
