@@ -1,0 +1,16 @@
+Please run on Linux
+
+Prerequisites
+  MPFR: https://www.mpfr.org/mpfr-current/
+  QD: number 4 at  https://www.davidhbailey.com/dhbsoftware/
+
+1. Install MPFR and Make
+  apt update
+  apt install libmpfr-dev make
+  
+2. Install QD
+  wget https://www.davidhbailey.com/dhbsoftware/qd-2.3.22.tar.gz
+  unzip and follow instruction to install
+
+3. Run
+  make && ./bench_mpfr_dd_qd
