@@ -17,3 +17,10 @@ Prerequisites
 
 4. Run
   make && ./bench_mpfr_dd_qd
+
+
+
+
+
+
+Raw data unit: millisecond
