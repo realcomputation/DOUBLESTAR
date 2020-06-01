@@ -12,5 +12,8 @@ Prerequisites
   wget https://www.davidhbailey.com/dhbsoftware/qd-2.3.22.tar.gz
   unzip and follow instruction to install
 
-3. Run
+3. Config the settings
+  In bench_mpfr_dd_qd.cpp, config matSizeN, matSize[], polySizeN, polySize[].
+
+4. Run
   make && ./bench_mpfr_dd_qd

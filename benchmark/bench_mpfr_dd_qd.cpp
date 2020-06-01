@@ -12,6 +12,8 @@
 //#define PRINT_VALUES
 
 
+// config
+// matSize[0 .. (matSizeN-1)] and polySize[0 .. (polySizeN-1)] will be tested
 #define matSizeN 1
 #define polySizeN 1
 int matSize[] = {100, 200, 500, 1000, 2000};
